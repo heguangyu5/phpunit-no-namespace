@@ -37,11 +37,11 @@ abstract class PHPUnit_DbUnit_TestCase extends PHPUnit\DbUnit\TestCase
 
 abstract class PHPUnit_DbUnit_Mysql_TestCase extends PHPUnit_DbUnit_TestCase
 {
-    protected static $mysqlHost     = 'localhost';
-    protected static $mysqlPort     = 3306;
+    protected static $mysqlHost     = '127.0.0.1';
+    protected static $mysqlPort     = 3307;
     protected static $mysqlDbname   = 'test';
     protected static $mysqlCharset  = 'utf8';
-    protected static $mysqlUsername = 'rootpw';
+    protected static $mysqlUsername = 'root';
     protected static $mysqlPasswd   = '123456';
 
     protected static function getPDOConfig()
