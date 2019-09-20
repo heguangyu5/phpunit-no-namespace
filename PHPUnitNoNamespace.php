@@ -1,7 +1,12 @@
 <?php
 
 class PHPUnit_Framework_TestCase extends PHPUnit\Framework\TestCase
-{}
+{
+    public function getMock($class)
+    {
+        return $this->createMock($class);
+    }
+}
 
 include 'DbUnit/autoload.php';
 
@@ -33,6 +38,11 @@ abstract class PHPUnit_DbUnit_TestCase extends PHPUnit\DbUnit\TestCase
     {
         throw new Exception('you should override this method in a subclass');
     }
+
+    public function getMock($class)
+    {
+        return $this->createMock($class);
+    }
 }
 
 abstract class PHPUnit_DbUnit_Mysql_TestCase extends PHPUnit_DbUnit_TestCase
@@ -60,3 +70,30 @@ abstract class PHPUnit_DbUnit_Mysql_TestCase extends PHPUnit_DbUnit_TestCase
         );
     }
 }
+
+abstract class PHPUnit_DbUnit_Mysql_Zend_TestCase extends PHPUnit_DbUnit_Mysql_TestCase
+{
+    public function getConnection()
+    {
+        if (self::$connection == null) {
+            $db = new Zend_Db_Adapter_Pdo_Mysql(array(
+                'host'     => static::$mysqlHost,
+                'username' => static::$mysqlUsername,
+                'password' => static::$mysqlPasswd,
+                'port'     => static::$mysqlPort,
+                'dbname'   => static::$mysqlDbname,
+                'charset'  => static::$mysqlCharset
+            ));
+            Zend_Db_Table_Abstract::setDefaultAdapter($db);
+            self::$pdo = $db->getConnection();
+            self::$connection = $this->createDefaultDBConnection(self::$pdo, static::$mysqlDbname);
+        }
+        return self::$connection;
+    }
+}
+
+class PHPUnit_DbUnit_DataSet_FilterDataSet extends PHPUnit\DbUnit\DataSet\Filter
+{}
+
+class PHPUnit_DbUnit_DataSet_QueryDataSet extends PHPUnit\DbUnit\DataSet\QueryDataSet
+{}
