@@ -73,10 +73,12 @@ abstract class PHPUnit_DbUnit_Mysql_TestCase extends PHPUnit_DbUnit_TestCase
 
 abstract class PHPUnit_DbUnit_Mysql_Zend_TestCase extends PHPUnit_DbUnit_Mysql_TestCase
 {
-    public function getConnection()
+    protected static $db;
+
+    public static function getDb()
     {
-        if (self::$connection == null) {
-            $db = new Zend_Db_Adapter_Pdo_Mysql(array(
+        if (self::$db == null) {
+            self::$db = new Zend_Db_Adapter_Pdo_Mysql(array(
                 'host'     => static::$mysqlHost,
                 'username' => static::$mysqlUsername,
                 'password' => static::$mysqlPasswd,
@@ -84,8 +86,15 @@ abstract class PHPUnit_DbUnit_Mysql_Zend_TestCase extends PHPUnit_DbUnit_Mysql_T
                 'dbname'   => static::$mysqlDbname,
                 'charset'  => static::$mysqlCharset
             ));
-            Zend_Db_Table_Abstract::setDefaultAdapter($db);
-            self::$pdo = $db->getConnection();
+            Zend_Db_Table_Abstract::setDefaultAdapter(self::$db);
+        }
+        return self::$db;
+    }
+
+    public function getConnection()
+    {
+        if (self::$connection == null) {
+            self::$pdo = self::getDb()->getConnection();
             self::$connection = $this->createDefaultDBConnection(self::$pdo, static::$mysqlDbname);
         }
         return self::$connection;
